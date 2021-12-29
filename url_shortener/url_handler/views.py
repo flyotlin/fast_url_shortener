@@ -37,11 +37,13 @@ def redirect_url(request, shortUrl):
     GET Request. Redirect the specific short url 
     param to the corresponding long url.
     """
-    
+
     # if (short_url, long_url) in redis, redirect by redis data
     longUrl = cache.get(shortUrl)
     if longUrl != None:
-        return redirect(longUrl)
+        response = redirect(longUrl)
+        response.headers['Via'] = 'redis'
+        return response
 
     # if (short_url, long_url) in MySQL, update redis, and redirect by MySQL data
 
