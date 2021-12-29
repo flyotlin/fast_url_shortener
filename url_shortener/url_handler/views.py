@@ -1,5 +1,6 @@
 from django.shortcuts import redirect, render
 from django.http import HttpResponse
+from django.core.cache import cache
 from . import url_shortener
 
 def index(request):
@@ -17,6 +18,13 @@ def create(request):
     """
     long_url = request.POST["long_url"]
     short_url = url_shortener.hash(long_url)
+
+    # (short_url, long_url) not in local redis do the following
+    if cache.get(short_url) != long_url:
+        # if (short_url, long_url) not in centralized MySQL, write to MySQL
+
+        # write to redis
+        cache.set(short_url, long_url, nx=True)
 
     return render(request, "url_handler/index.html", {
         "visible": True, 
