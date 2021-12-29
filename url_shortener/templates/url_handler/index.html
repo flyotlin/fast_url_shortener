@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+  <head> </head>
+  <body>
+    <h1>Django Fast Url Shortener</h1>
+    <form action="/create_url" method="post">
+      {% csrf_token %}
+      <div>The url to be shortened:</div>
+      <div>
+        <input name="long_url" type="text" value="{{long_url}}" />
+      </div>
+      {% if visible == False %}
+      <div><input type="submit" value="Send" /></div>
+      {% else %}
+      <div>The shortened url:</div>
+      <div>{{ short_url }}</div>
+      {% endif %}
+    </form>
+  </body>
+</html>

@@ -1,0 +1,11 @@
+version: "3.0"
+services:
+  django:
+    build: .
+    command: bash -c "cd /src/url_shortener && python manage.py runserver 0.0.0.0:8000"
+    ports:
+      - 3000:8000
+    volumes:
+      - .:/src
+  redis:
+    image: redis:6.2.6
