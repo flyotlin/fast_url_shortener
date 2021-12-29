@@ -24,7 +24,7 @@ def create(request):
         # if (short_url, long_url) not in centralized MySQL, write to MySQL
 
         # write to redis
-        cache.set(short_url, long_url, nx=True)
+        cache.set(short_url, long_url, nx=True, timeout=None)   # never expires
 
     return render(request, "url_handler/index.html", {
         "visible": True, 
@@ -37,5 +37,13 @@ def redirect_url(request, shortUrl):
     GET Request. Redirect the specific short url 
     param to the corresponding long url.
     """
-    print("short url is:", shortUrl)
-    return redirect('https://www.facebook.com/')
+    
+    # if (short_url, long_url) in redis, redirect by redis data
+    longUrl = cache.get(shortUrl)
+    if longUrl != None:
+        return redirect(longUrl)
+
+    # if (short_url, long_url) in MySQL, update redis, and redirect by MySQL data
+
+    # return not found
+    return render(request, "url_handler/error.html")
