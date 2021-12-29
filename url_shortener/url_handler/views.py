@@ -1,16 +1,22 @@
 from django.shortcuts import redirect, render
 from django.http import HttpResponse
-import hashlib, base58
+from . import url_shortener
 
-def add_url(request):
+def index(request):
+    """
+    GET Request. Render the index html page.
+    """
     return render(request, "url_handler/index.html", {
         "visible": False, 
         "long_url": ""
     })
 
-def create_short_url(request):
+def create(request):
+    """
+    POST Request. Create short url according to long url from request body.
+    """
     long_url = request.POST["long_url"]
-    short_url = url_shortener(long_url)
+    short_url = url_shortener.hash(long_url)
 
     return render(request, "url_handler/index.html", {
         "visible": True, 
@@ -19,19 +25,9 @@ def create_short_url(request):
     })
 
 def redirect_url(request, shortUrl):
+    """
+    GET Request. Redirect the specific short url 
+    param to the corresponding long url.
+    """
     print("short url is:", shortUrl)
     return redirect('https://www.facebook.com/')
-
-# Url shortener utility function.
-# Use sha256 and base58 to encode long_url
-def url_shortener(long_url):
-    sha256 = hashlib.sha256()
-    sha256.update(str.encode(long_url))
-    sha256_hex_str = int(sha256.hexdigest(), 16)
-    sha256_lsb_64num = int(bin(sha256_hex_str)[-64:], 2)
-
-    short_url_byte_num = str(sha256_lsb_64num).encode()
-    short_url = base58.b58encode(short_url_byte_num).decode()[:8]
-
-    return short_url
-
