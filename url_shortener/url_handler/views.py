@@ -2,6 +2,7 @@ from django.shortcuts import redirect, render
 from django.http import HttpResponse
 from django.core.cache import cache
 from . import url_shortener
+from .models import Urls
 
 def index(request):
     """
@@ -22,7 +23,9 @@ def create(request):
     # (short_url, long_url) not in local redis do the following
     if cache.get(short_url) != long_url:
         # if (short_url, long_url) not in centralized MySQL, write to MySQL
-
+        mySqlResult = Urls.objects.all().filter(short_url=short_url)
+        if mySqlResult.count() == 0:
+            Urls.objects.create(short_url=short_url, long_url=long_url)
         # write to redis
         cache.set(short_url, long_url, nx=True, timeout=None)   # never expires
 
