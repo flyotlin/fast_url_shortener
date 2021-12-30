@@ -4,7 +4,8 @@ services:
     build: .
     command: bash -c "cd /src/url_shortener && python manage.py runserver 0.0.0.0:8000"
     ports:
-      - 3000:8000
+      - 80:8000
+      - 443:8000
     volumes:
       - .:/src
   redis:
