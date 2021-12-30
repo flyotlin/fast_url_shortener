@@ -49,6 +49,13 @@ def redirect_url(request, shortUrl):
         return response
 
     # if (short_url, long_url) in MySQL, update redis, and redirect by MySQL data
+    mySqlResult = Urls.objects.all().filter(short_url=shortUrl)
+    if mySqlResult.count() != 0:
+        longUrl = mySqlResult[0].long_url
+        cache.set(shortUrl, longUrl, nx=True, timeout=None)
+        response = redirect(longUrl)
+        response.headers['Via'] = 'mysql'
+        return response
 
     # return not found
     return render(request, "url_handler/error.html")
